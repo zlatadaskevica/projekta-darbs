@@ -132,15 +132,21 @@ class SavedEvent:
         Saves an event for a specific user
         Creates relationship between user and event
         """
-        
+
         db = get_database()
-        
+
+        # Check for duplicate saved relation to avoid repeated inserts
+        existing = db.table("saved_events").select("id").eq("user_id", user_id).eq("event_id", event_id).execute()
+
+        if existing.data:
+            return existing.data
+
         # Insert into saved_events table
         response = db.table("saved_events").insert({
             "user_id": user_id,
             "event_id": event_id
         }).execute()
-        
+
         return response.data
     
     @staticmethod

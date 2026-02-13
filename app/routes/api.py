@@ -14,6 +14,17 @@ from app.services.astronomy import get_moon_phase, calculate_visibility_for_latv
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 
+def _get_event_id_from_request():
+    """
+    Reads event_id from JSON request body.
+    Returns event_id or None.
+    """
+
+    data = request.get_json(silent=True) or {}
+
+    return data.get('event_id')
+
+
 @api_bp.route('/events', methods=['GET'])
 def get_events():
     """
@@ -68,8 +79,7 @@ def save_event():
         }), 401
     
     # Get event ID from request
-    data = request.get_json()
-    event_id = data.get('event_id')
+    event_id = _get_event_id_from_request()
     
     if not event_id:
         return jsonify({
@@ -104,8 +114,7 @@ def unsave_event():
         }), 401
     
     # Get event ID from request
-    data = request.get_json()
-    event_id = data.get('event_id')
+    event_id = _get_event_id_from_request()
     
     if not event_id:
         return jsonify({

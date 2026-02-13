@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Astronomy & Space Events Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>🌙 Astronomy Tracker</h1>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('pages.index') }}">Home</a>
+                <a href="{{ url_for('pages.events') }}">Events</a>
+
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('pages.my_events') }}">My Events</a>
+                    <a href="{{ url_for('pages.logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('pages.login') }}">Login</a>
+                    <a href="{{ url_for('pages.register') }}">Register</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Astronomy & Space Events Tracker | Data from NASA Open APIs</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

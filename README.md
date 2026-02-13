@@ -1,86 +1,53 @@
 # Astronomy & Space Events Tracker
 
-This project is a Python web application that tracks astronomy and space-related events
-for users in Latvia, using public APIs and astronomical calculations.
+A Flask web app where users can:
 
-The application includes:
-- User authentication
-- A database with multiple related tables
-- Integration with external APIs (NASA API)
-- Astronomical calculations (e.g. Moon phases)
-- Clean, readable, and well-structured Python code
+- register and log in
+- view astronomy/space events
+- save events to a personal list (`saved_events`)
+- see NASA APOD and astronomy calculations
 
-## Tech Stack
-- Python
-- Flask (backend)
-- Supabase (PostgreSQL database)
+## Stack
+
+- Python + Flask
+- Supabase (tables: `users`, `events`, `saved_events`)
 - NASA Open API
-- Skyfield (astronomical calculations)
+- Skyfield
 
----
+## Setup
 
-## Project Structure and File Responsibilities
+1. Install dependencies:
 
-### app/main.py
-Entry point of the application.
-Initializes the web app, loads configuration, and registers routes.
+```bash
+pip install -r requirements.txt
+```
 
-### app/config.py
-Loads environment variables and application configuration.
-No hardcoded secrets.
+2. Create `.env` from template:
 
-### app/database.py
-Handles database connection to Supabase.
-Contains database client initialization.
+```bash
+cp .env.example .env
+```
 
-### app/models.py
-Defines data models and data access logic.
-Represents tables: users, events, saved_events.
+3. Fill in values in `.env`:
 
-### app/auth.py
-Handles user registration and login.
-Includes password hashing and basic access protection.
+- `SUPABASE_URL`
+- `SUPABASE_KEY`
+- `NASA_API_KEY`
+- `SECRET_KEY`
 
-### app/services/nasa.py
-Responsible for communication with NASA API.
-Fetches Astronomy Picture of the Day and other space data.
+4. In Supabase SQL editor, run:
 
-### app/services/astronomy.py
-Contains astronomical calculations.
-Used for Moon phases and visibility logic.
+- `supabase_schema.sql`
 
-### app/routes/pages.py
-Defines routes that render HTML pages for users.
+5. Start app:
 
-### app/routes/api.py
-Defines API endpoints for fetching events and user data.
+```bash
+python -m app.main
+```
 
-### app/templates/
-Contains HTML templates.
-Only presentation logic, no business logic.
+Open: `http://localhost:5000`
 
-### static/
-Contains static files such as CSS.
+## Notes
 
----
-
-## Coding Style and Best Practices (IMPORTANT)
-
-When generating code, ALWAYS follow these rules:
-
-- Each statement must be written on a new line
-- Separate logical code blocks (conditions, loops, lists) with an empty line
-- Use indentation consistently to show structure
-- Avoid long lines; split lines to improve readability
-- Use meaningful variable and function names
-  (e.g. `event_date` instead of `d`)
-- Add comments explaining:
-  - logical blocks
-  - purpose of conditions and loops
-  - role of the code section (e.g. data fetching, data output)
-
-The code must be:
-- readable
-- beginner-friendly
-- logically structured
-- suitable for a school project
+- If `events` table is empty, the app auto-loads initial events from NASA NEO feed.
+- Users can save/unsave events from `/events`.

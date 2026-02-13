@@ -1,117 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Astronomy & Space Events Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <header>
-        <nav>
-            <div class="logo">
-                <h1>🌙 Astronomy Tracker</h1>
-            </div>
-            <div class="nav-links">
-                <a href="{{ url_for('pages.index') }}">Home</a>
-                <a href="{{ url_for('pages.events') }}">Events</a>
-                
-                {% if user_id %}
-                    <a href="{{ url_for('pages.my_events') }}">My Events</a>
-                    <a href="{{ url_for('pages.logout') }}">Logout</a>
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if apod %}
+    <section class="apod-section">
+        <h2>Astronomy Picture of the Day</h2>
+        <div class="apod-container">
+            <div class="apod-image">
+                {% if apod.media_type == 'image' %}
+                    <img src="{{ apod.url }}" alt="{{ apod.title }}">
                 {% else %}
-                    <a href="{{ url_for('pages.login') }}">Login</a>
-                    <a href="{{ url_for('pages.register') }}">Register</a>
+                    <iframe src="{{ apod.url }}" frameborder="0" allowfullscreen></iframe>
                 {% endif %}
             </div>
-        </nav>
-    </header>
+            <div class="apod-info">
+                <h3>{{ apod.title }}</h3>
+                <p class="date">{{ apod.date }}</p>
+                <p class="description">{{ apod.explanation }}</p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 
-    <main>
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="messages">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
+    {% if moon_phase %}
+    <section class="moon-section">
+        <h2>Current Moon Phase</h2>
+        <div class="moon-container">
+            <div class="moon-phase">
+                <div class="moon-icon">🌙</div>
+                <h3>{{ moon_phase.phase_name }}</h3>
+                <p>Illumination: {{ moon_phase.illumination }}%</p>
+                <p>Phase Angle: {{ moon_phase.phase_angle }}°</p>
+            </div>
+
+            {% if visibility %}
+            <div class="visibility-info">
+                <h4>Visibility in {{ visibility.location }}</h4>
+                {% if visibility.rise_set.moonrise %}
+                    <p>Moonrise: {{ visibility.rise_set.moonrise.strftime('%H:%M') }}</p>
+                {% endif %}
+                {% if visibility.rise_set.moonset %}
+                    <p>Moonset: {{ visibility.rise_set.moonset.strftime('%H:%M') }}</p>
+                {% endif %}
+            </div>
             {% endif %}
-        {% endwith %}
+        </div>
+    </section>
+    {% endif %}
 
-        <!-- NASA Astronomy Picture of the Day -->
-        {% if apod %}
-        <section class="apod-section">
-            <h2>Astronomy Picture of the Day</h2>
-            <div class="apod-container">
-                <div class="apod-image">
-                    {% if apod.media_type == 'image' %}
-                        <img src="{{ apod.url }}" alt="{{ apod.title }}">
-                    {% else %}
-                        <iframe src="{{ apod.url }}" frameborder="0" allowfullscreen></iframe>
-                    {% endif %}
-                </div>
-                <div class="apod-info">
-                    <h3>{{ apod.title }}</h3>
-                    <p class="date">{{ apod.date }}</p>
-                    <p class="description">{{ apod.explanation }}</p>
-                </div>
+    {% if events %}
+    <section class="events-section">
+        <h2>Upcoming Astronomy Events</h2>
+        <div class="events-grid">
+            {% for event in events %}
+            <div class="event-card">
+                <h3>{{ event.title }}</h3>
+                <p class="event-type">{{ event.event_type }}</p>
+                <p class="event-date">{{ event.event_date }}</p>
+                <p class="event-description">{{ event.description }}</p>
             </div>
-        </section>
-        {% endif %}
-
-        <!-- Moon Phase Information -->
-        {% if moon_phase %}
-        <section class="moon-section">
-            <h2>Current Moon Phase</h2>
-            <div class="moon-container">
-                <div class="moon-phase">
-                    <div class="moon-icon">🌙</div>
-                    <h3>{{ moon_phase.phase_name }}</h3>
-                    <p>Illumination: {{ moon_phase.illumination }}%</p>
-                    <p>Phase Angle: {{ moon_phase.phase_angle }}°</p>
-                </div>
-                
-                {% if visibility %}
-                <div class="visibility-info">
-                    <h4>Visibility in {{ visibility.location }}</h4>
-                    {% if visibility.rise_set.moonrise %}
-                        <p>Moonrise: {{ visibility.rise_set.moonrise.strftime('%H:%M') }}</p>
-                    {% endif %}
-                    {% if visibility.rise_set.moonset %}
-                        <p>Moonset: {{ visibility.rise_set.moonset.strftime('%H:%M') }}</p>
-                    {% endif %}
-                </div>
-                {% endif %}
-            </div>
-        </section>
-        {% endif %}
-
-        <!-- Upcoming Events -->
-        {% if events %}
-        <section class="events-section">
-            <h2>Upcoming Astronomy Events</h2>
-            <div class="events-grid">
-                {% for event in events %}
-                <div class="event-card">
-                    <h3>{{ event.title }}</h3>
-                    <p class="event-type">{{ event.event_type }}</p>
-                    <p class="event-date">{{ event.event_date }}</p>
-                    <p class="event-description">{{ event.description }}</p>
-                </div>
-                {% endfor %}
-            </div>
-            <div class="view-all">
-                <a href="{{ url_for('pages.events') }}" class="btn">View All Events</a>
-            </div>
-        </section>
-        {% endif %}
-    </main>
-
-    <footer>
-        <p>&copy; 2026 Astronomy & Space Events Tracker | Data from NASA Open APIs</p>
-    </footer>
-</body>
-</html>
+            {% endfor %}
+        </div>
+        <div class="view-all">
+            <a href="{{ url_for('pages.events') }}" class="btn">View All Events</a>
+        </div>
+    </section>
+    {% endif %}
+{% endblock %}
