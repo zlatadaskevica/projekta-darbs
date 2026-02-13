@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Events | Astronomy Tracker{% endblock %}
+
+{% block content %}
+<section>
+    <h2>All Astronomy and Space Events</h2>
+
+    {% if not user_id %}
+    <p>Please log in if you want to save events to your personal list.</p>
+    {% endif %}
+
+    <div class="events-grid">
+        {% for event in events %}
+        <div class="event-card">
+            <h3>{{ event.title }}</h3>
+            <p class="event-type">{{ event.event_type }}</p>
+            <p class="event-date">{{ event.event_date }}</p>
+            <p class="event-description">{{ event.description }}</p>
+
+            {% if user_id %}
+                {% if event.id in saved_event_ids %}
+                    <button
+                        class="btn action-btn"
+                        data-event-id="{{ event.id }}"
+                        data-action="unsave"
+                    >Remove from My Events</button>
+                {% else %}
+                    <button
+                        class="btn action-btn"
+                        data-event-id="{{ event.id }}"
+                        data-action="save"
+                    >Save Event</button>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function handleEventAction(button) {
+        const eventId = Number(button.dataset.eventId);
+        const action = button.dataset.action;
+
+        const endpoint = action === 'save'
+            ? '/api/events/save'
+            : '/api/events/unsave';
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ event_id: eventId })
+        });
+
+        if (!response.ok) {
+            alert('Could not update event. Please try again.');
+            return;
+        }
+
+        if (action === 'save') {
+            button.textContent = 'Remove from My Events';
+            button.dataset.action = 'unsave';
+        } else {
+            button.textContent = 'Save Event';
+            button.dataset.action = 'save';
+        }
+    }
+
+    document.querySelectorAll('.action-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+            handleEventAction(button);
+        });
+    });
+</script>
+{% endblock %}

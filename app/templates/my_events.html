@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}My Saved Events | Astronomy Tracker{% endblock %}
+
+{% block content %}
+<section>
+    <h2>My Saved Events</h2>
+
+    {% if not saved_events %}
+        <p>You have not saved any events yet. Open the Events page and save the ones you like.</p>
+    {% else %}
+        <div class="events-grid">
+            {% for saved in saved_events %}
+            <div class="event-card">
+                <h3>{{ saved.events.title }}</h3>
+                <p class="event-type">{{ saved.events.event_type }}</p>
+                <p class="event-date">{{ saved.events.event_date }}</p>
+                <p class="event-description">{{ saved.events.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

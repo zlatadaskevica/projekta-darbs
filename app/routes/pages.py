@@ -8,10 +8,21 @@ from app.auth import register_user, login_user
 from app.models import Event, SavedEvent
 from app.services.nasa import get_apod
 from app.services.astronomy import get_moon_phase, calculate_visibility_for_latvia
+from app.services.event_loader import ensure_events_available
 
 
 # Create Blueprint for page routes
 pages_bp = Blueprint('pages', __name__)
+
+
+def _get_saved_event_ids_for_user(user_id):
+    """
+    Returns a list of event IDs saved by the user.
+    """
+
+    saved_events = SavedEvent.get_user_saved_events(user_id)
+
+    return [saved_event['event_id'] for saved_event in saved_events]
 
 
 @pages_bp.route('/')
@@ -21,6 +32,9 @@ def index():
     Shows astronomy information and upcoming events
     """
     
+    # Ensure that events are available for users
+    ensure_events_available()
+
     # Get NASA Astronomy Picture of the Day
     apod_data = get_apod()
     
@@ -132,6 +146,9 @@ def events():
     Shows all astronomy events
     """
     
+    # Ensure that events are available for users
+    ensure_events_available()
+
     # Get all events
     all_events = Event.get_all()
     
@@ -140,9 +157,9 @@ def events():
     
     # Get user's saved events if logged in
     saved_event_ids = []
+
     if user_id:
-        saved_events = SavedEvent.get_user_saved_events(user_id)
-        saved_event_ids = [se['event_id'] for se in saved_events]
+        saved_event_ids = _get_saved_event_ids_for_user(user_id)
     
     return render_template(
         'events.html',

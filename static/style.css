@@ -334,3 +334,10 @@ footer {
         justify-content: center;
     }
 }
+
+.action-btn {
+    margin-top: 0.8rem;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+}
